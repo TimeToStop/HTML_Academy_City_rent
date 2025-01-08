@@ -42,8 +42,9 @@ function App(): JSX.Element {
         //      33% - no change 
         //      33% - popups 
         //      33% - Yuliya 
-        const usePopupDialogs = hash % 3 === 1; 
-        const reviewsToUpFlag = hash % 3 === 2;
+        console.log(hash % 1000);
+        const usePopupDialogs = hash % 1000 < 333; 
+        const reviewsToUpFlag = 333 <= hash % 1000 && hash % 1000 < 666;
 
         const group = usePopupDialogs ? 'popups' : (reviewsToUp ? 'reviewsToUp' : 'common');
 

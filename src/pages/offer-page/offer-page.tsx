@@ -39,6 +39,8 @@ const OfferPage = ({ reviewsToUp }: OfferPageProps): JSX.Element => {
     // Устанавливаем время входа при загрузке страницы
     setEntryTime(Date.now());
 
+    (window as any).yaCounter99437467.reachGoal('offerWasOpened');
+
     return () => {
       // Вычисляем время пребывания на странице
       const timeSpent = Date.now() - entryTime;
