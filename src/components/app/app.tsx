@@ -27,9 +27,6 @@ function App(): JSX.Element {
   const [usePopup, setUsePopup] = useState(false);
   const [reviewsToUp, setReviewsToUp] = useState<boolean>(false);
 
-  // unused variable
-  console.log(reviewsToUp);
-
   useAppInit();
   useEffect(() => {
     // need to wait fo yandex metrika loading
@@ -39,16 +36,14 @@ function App(): JSX.Element {
     
       if (counter && counter.getClientID) {
         const id: string = counter.getClientID();
-        const hash = stringToIntHash(id);
+        const hash = Math.abs(stringToIntHash(id));
 
         // ensure that it is even chance
         //      33% - no change 
         //      33% - popups 
         //      33% - Yuliya 
         const usePopupDialogs = hash % 3 === 1; 
-          // hash % 3 === 1;
-        const reviewsToUpFlag = hash % 3 === 0;
-           // hash % 3 === 2;
+        const reviewsToUpFlag = hash % 3 === 2;
 
         const group = usePopupDialogs ? 'popups' : (reviewsToUp ? 'reviewsToUp' : 'common');
 
