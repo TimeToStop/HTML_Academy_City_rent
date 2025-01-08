@@ -1,5 +1,5 @@
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReviewList from '../../components/review/riviews-list.tsx';
 import Map from '../../components/map/map.tsx';
 import OffersList from '../../components/offers-list/offers-list.tsx';
@@ -14,10 +14,13 @@ import ReviewForm from '../../components/review/review-form.tsx';
 import { APP_ROUTES } from '../../services/constants.ts';
 import Error404 from '../Error404/Error404.tsx';
 
-const OfferPage = (): JSX.Element => {
+interface OfferPageProps {
+  reviewsToUp: boolean; 
+}
+
+const OfferPage = ({ reviewsToUp }: OfferPageProps): JSX.Element => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
   const { id } = useParams();
   const authorizationStatus = useAppSelector(
     (state) => state.userSlice.authorizationStatus
@@ -25,10 +28,26 @@ const OfferPage = (): JSX.Element => {
   const { offer, comments, nearbyOffers, offerLoading, offerError } =
     useAppSelector((state) => state.offerSlice);
 
+
+  const [entryTime, setEntryTime] = useState<number>(Date.now());
+
   useEffect(() => {
     if (id) {
       dispatch(fetchOffer(id));
     }
+
+    // Устанавливаем время входа при загрузке страницы
+    setEntryTime(Date.now());
+
+    return () => {
+      // Вычисляем время пребывания на странице
+      const timeSpent = Date.now() - entryTime;
+
+      // Отправляем данные о времени пребывания в Яндекс Метрику
+      if ((window as any).yaCounter99437467) {
+        (window as any).yaCounter99437467.reachGoal('timeSpentOnOfferPage', timeSpent);
+      }
+    };
   }, [id, dispatch]);
 
   const nearbyPoints = useMemo(
@@ -107,6 +126,15 @@ const OfferPage = (): JSX.Element => {
                 containerClassName="offer__rating"
                 starsClassName="offer__stars"
               />
+              { reviewsToUp && <section className="offer__reviews reviews">
+                <h2 className="reviews__title">
+                  Reviews &middot;{' '}
+                  <span className="reviews__amount">{comments.length}</span>
+                </h2>
+                <ReviewList reviews={comments} />
+                {authorizationStatus ? <ReviewForm offerId={id!} /> : null}
+              </section>
+              }
               <ul className="offer__features">
                 <li className="offer__feature offer__feature--entire">
                   {offer.type.charAt(0).toUpperCase() + offer.type.slice(1)}
@@ -157,14 +185,6 @@ const OfferPage = (): JSX.Element => {
                   <p className="offer__text">{offer.description}</p>
                 </div>
               </div>
-              <section className="offer__reviews reviews">
-                <h2 className="reviews__title">
-                  Reviews &middot;{' '}
-                  <span className="reviews__amount">{comments.length}</span>
-                </h2>
-                <ReviewList reviews={comments} />
-                {authorizationStatus ? <ReviewForm offerId={id!} /> : null}
-              </section>
             </div>
           </div>
           <section className="offer__map map">
@@ -184,6 +204,14 @@ const OfferPage = (): JSX.Element => {
             <OffersList offers={nearbyOffers} type="Nearby" />
           </section>
         </div>
+          { !reviewsToUp && <section className="offer__reviews reviews">
+                <h2 className="reviews__title">
+                  Reviews &middot;{' '}
+                  <span className="reviews__amount">{comments.length}</span>
+                </h2>
+                <ReviewList reviews={comments} />
+                {authorizationStatus ? <ReviewForm offerId={id!} /> : null}
+        </section>}
       </main>
     </div>
   );

@@ -25,10 +25,10 @@ function stringToIntHash(str: string): number {
 
 function App(): JSX.Element {
   const [usePopup, setUsePopup] = useState(false);
-  const [useYuliyaHypotesis, setYuliyaHypotesis] = useState(false);
+  const [reviewsToUp, setReviewsToUp] = useState<boolean>(false);
 
   // unused variable
-  console.log(useYuliyaHypotesis);
+  console.log(reviewsToUp);
 
   useAppInit();
   useEffect(() => {
@@ -45,12 +45,12 @@ function App(): JSX.Element {
         //      33% - no change 
         //      33% - popups 
         //      33% - Yuliya 
-        const usePopupDialogs = true; 
+        const usePopupDialogs = hash % 3 === 1; 
           // hash % 3 === 1;
-        const useYuliyaHypotesis = false; 
+        const reviewsToUpFlag = hash % 3 === 0;
            // hash % 3 === 2;
 
-        const group =  usePopupDialogs ? 'popups' : (useYuliyaHypotesis ? 'yuliya' : 'common');
+        const group = usePopupDialogs ? 'popups' : (reviewsToUp ? 'reviewsToUp' : 'common');
 
         // hash is unused variable
         console.log('yandex metrika has been found ', hash);
@@ -62,7 +62,7 @@ function App(): JSX.Element {
         });
 
         setUsePopup(usePopupDialogs);
-        setYuliyaHypotesis(useYuliyaHypotesis);
+        setReviewsToUp(reviewsToUpFlag);
       } else {
         console.error("Счетчик Яндекс Метрики не найден или не загружен.");
       }
@@ -80,8 +80,14 @@ function App(): JSX.Element {
           element={<PrivateRoute element={<FavoritesPage />} />}
         />
         <Route path={'/HTML_Academy_City_rent/favorites'} element={<PrivateRoute element={<FavoritesPage />} />}/>
-        <Route path={APP_ROUTES.OFFER(':id')} element={<OfferPage />} />
-        <Route path={'/HTML_Academy_City_rent' + APP_ROUTES.OFFER(':id')} element={<OfferPage />} />
+        <Route 
+          path={APP_ROUTES.OFFER(':id')} 
+          element={<OfferPage reviewsToUp={reviewsToUp} />} 
+        />
+        <Route 
+          path={'/HTML_Academy_City_rent' + APP_ROUTES.OFFER(':id')} 
+          element={<OfferPage reviewsToUp={reviewsToUp} />} 
+        />
         <Route path="/*" element={<Error404 description="Error" />} />
       </Routes>
     </BrowserRouter>
