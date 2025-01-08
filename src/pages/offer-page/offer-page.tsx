@@ -28,10 +28,28 @@ const OfferPage = ({ reviewsToUp }: OfferPageProps): JSX.Element => {
   const { offer, comments, nearbyOffers, offerLoading, offerError } =
     useAppSelector((state) => state.offerSlice);
 
+
+  const [entryTime, setEntryTime] = useState<number>(Date.now());
+
   useEffect(() => {
     if (id) {
       dispatch(fetchOffer(id));
     }
+
+    // Устанавливаем время входа при загрузке страницы
+    setEntryTime(Date.now());
+
+    return () => {
+      // Вычисляем время пребывания на странице
+      const timeSpent = Date.now() - entryTime;
+      console.log(timeSpent);
+
+      // Отправляем данные о времени пребывания в Яндекс Метрику
+      if ((window as any).yaCounter99437467 && timeSpent > 20 * 1000) {
+        console.log('commit timeSpentOnOfferPage > 20s');
+        (window as any).yaCounter99437467.reachGoal('timeSpentOnOfferPage');
+      }
+    };
   }, [id, dispatch]);
 
   const nearbyPoints = useMemo(
