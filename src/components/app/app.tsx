@@ -46,7 +46,7 @@ function App(): JSX.Element {
         const usePopupDialogs = hash % 1000 < 333; 
         const reviewsToUpFlag = 333 <= hash % 1000 && hash % 1000 < 666;
 
-        const group = usePopupDialogs ? 'popups' : (reviewsToUp ? 'reviewsToUp' : 'common');
+        const group = usePopupDialogs ? 'popups' : (reviewsToUpFlag ? 'reviewsToUp' : 'common');
 
         // hash is unused variable
         console.log('yandex metrika has been found ', hash);
